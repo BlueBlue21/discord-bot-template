@@ -1,6 +1,6 @@
 # Discord Bot Template! 🤖
 
-Made with Discord.js v14 and Typescript!
+Made with Discord.js v14 and Typescript
 
 Require Typescript Compiler!
 
