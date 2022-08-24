@@ -2,7 +2,7 @@
   "name": "name",
   "version": "1.0.0",
   "description": "Description",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "start": "npx tsc && node ./dist/index.js"
   },
