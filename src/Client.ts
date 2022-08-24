@@ -3,8 +3,12 @@ import { Client, Collection, CommandInteraction, GatewayIntentBits, EmbedBuilder
 
 import "./modules/registerSlash";
 
+interface commandType {
+    execute: (interaction: CommandInteraction, client: Client) => Promise<void>;
+}
+
 export class BetterClient extends Client {
-    commands: Collection<string, any> = new Collection();
+    commands = new Collection<string, commandType>()
 
     constructor() {
         super({
@@ -33,11 +37,7 @@ export class BetterClient extends Client {
         this.on("interactionCreate", async interaction => {
             if (!interaction.isChatInputCommand()) return;
 
-            interface commandType {
-                execute: (interaction: CommandInteraction, client: Client) => Promise<void>;
-            }
-
-            const command: commandType = this.commands.get(interaction.commandName);
+            const command = this.commands.get(interaction.commandName);
 
             if (!command) return;
 
