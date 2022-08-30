@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx tsc && node ./dist/index.js"
   },
-  "author": "Author",
+  "author": "author",
   "license": "WTFPL",
   "dependencies": {
     "@discordjs/rest": "^1.0.1",
