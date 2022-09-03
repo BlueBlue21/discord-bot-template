@@ -1,10 +1,10 @@
 import { SlashCommandBuilder, CommandInteraction, Client, EmbedBuilder } from "discord.js";
 
-module.exports = {
+export default {
     data: new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Pong!"),
-    async execute(interaction: CommandInteraction, client: Client) {
+    run: async (interaction: CommandInteraction, client: Client) => {
         const embed = new EmbedBuilder()
             .setTitle("Ping!")
             .setDescription(`Pong! **(${client.ws.ping}ms!)**`)

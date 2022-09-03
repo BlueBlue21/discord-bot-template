@@ -1,10 +1,14 @@
-import fs from "fs";
-import { Client, Collection, CommandInteraction, GatewayIntentBits, EmbedBuilder, ApplicationCommandDataResolvable } from "discord.js";
+import fs from "fs/promises";
+import path from "path";
+import { Client, Collection, CommandInteraction, GatewayIntentBits, SlashCommandBuilder, EmbedBuilder, ApplicationCommandDataResolvable } from "discord.js";
 
 import "./modules/registerSlash";
 
 interface commandType {
-    execute: (interaction: CommandInteraction, client: Client) => Promise<void>;
+    default: {
+        data: SlashCommandBuilder;
+        run: (interaction: CommandInteraction, client: Client) => Promise<void>;
+    }
 }
 
 export class BetterClient extends Client {
@@ -21,18 +25,19 @@ export class BetterClient extends Client {
         this.login(token);
     }
 
-    registerCommands() {
+    async registerCommands() {
         const commands: ApplicationCommandDataResolvable[] = [];
 
-        const commandFiles = fs.readdirSync(__dirname + "/commands").filter(file => file.endsWith(".js"));
+        const commandFiles = await fs.readdir(path.join(__dirname, "/commands"));
 
-        commandFiles.forEach(file => {
-            const command = require(`./commands/${file}`);
+        await Promise.all(commandFiles.map(async (file) => {
+            if (file.endsWith(".ts") || file.endsWith(".js")) {
+                const command = await import(`./commands/${file}`);
 
-            this.commands.set(command.data?.name, command);
-
-            commands.push(command);
-        });
+                this.commands.set(command.default?.data.name, command);
+                commands.push(command);
+            }
+        }));
 
         this.on("interactionCreate", async interaction => {
             if (!interaction.isChatInputCommand()) return;
@@ -42,7 +47,7 @@ export class BetterClient extends Client {
             if (!command) return;
 
             try {
-                await command.execute(interaction, this);
+                await command.default.run(interaction, this);
             } catch (error) {
                 const embed = new EmbedBuilder()
                     .setTitle("Error!")
