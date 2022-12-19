@@ -1,10 +1,10 @@
-# Discord Bot Template! 🤖
+# Discord Bot template 🤖
 
-Made with Discord.js v14 and Typescript
+Made with Typescript and Discord.js v14
 
-Require Typescript Compiler!
+Required : Typescript compiler
 
-Thanks, Rorack and Dollar and Real!
+Thanks, Rorack and Dollar and Real.
 
 ```bash
 # Run
