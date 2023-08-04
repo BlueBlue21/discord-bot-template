@@ -1,18 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
-import { Client, Collection, CommandInteraction, GatewayIntentBits, SlashCommandBuilder, EmbedBuilder, ApplicationCommandDataResolvable } from "discord.js";
+import { Client, Collection, GatewayIntentBits, EmbedBuilder, ApplicationCommandDataResolvable } from "discord.js";
 
-import "./modules/registerSlash";
-
-interface commandType {
-    default: {
-        data: SlashCommandBuilder;
-        run: (interaction: CommandInteraction, client: Client) => Promise<void>;
-    }
-}
+import { commandType } from './types/Interactions'
+import registerSlash from "./modules/registerSlash";
 
 export class BetterClient extends Client {
-    commands = new Collection<string, commandType>()
+    private commands = new Collection<string, commandType>()
 
     constructor() {
         super({
@@ -21,24 +15,31 @@ export class BetterClient extends Client {
     }
 
     start(token: string) {
-        this.registerCommands();
-        this.login(token);
+        this.registerCommands().then(() => { // Re-registers the commands everytime this script is ran
+            console.log("Logging into Discord....");
+            this.login(token).catch((e) => {
+                console.log("Failed to log into Discord.");
+                throw e;
+            });
+        })
     }
 
-    async registerCommands() {
-        const commands: ApplicationCommandDataResolvable[] = [];
+    private async registerCommands() {
+
+        registerSlash();
 
         const commandFiles = await fs.readdir(path.join(__dirname, "/commands"));
 
         await Promise.all(commandFiles.map(async (file) => {
             if (file.endsWith(".ts") || file.endsWith(".js")) {
-                const command = await import(`./commands/${file}`);
+                const command: commandType = await import(`./commands/${file}`);
 
-                this.commands.set(command.default?.data.name, command);
-                commands.push(command);
+                this.commands.set(command.data.name, command);
             }
         }));
+    }
 
+    public async listen() {
         this.on("interactionCreate", async interaction => {
             if (!interaction.isChatInputCommand()) return;
 
@@ -47,7 +48,7 @@ export class BetterClient extends Client {
             if (!command) return;
 
             try {
-                await command.default.run(interaction, this);
+                await command.run(interaction, this);
             } catch (error) {
                 const embed = new EmbedBuilder()
                     .setTitle("Error!")

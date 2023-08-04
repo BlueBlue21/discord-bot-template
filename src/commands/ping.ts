@@ -1,10 +1,12 @@
-import { SlashCommandBuilder, CommandInteraction, Client, EmbedBuilder } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 
-export default {
+import { commandType } from "../types/Interactions";
+
+export = {
     data: new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Pong!"),
-    run: async (interaction: CommandInteraction, client: Client) => {
+    run: async ( interaction, client ) => {
         const embed = new EmbedBuilder()
             .setTitle("Ping!")
             .setDescription(`Pong! **(${client.ws.ping}ms!)**`)
@@ -13,4 +15,4 @@ export default {
 
         await interaction.reply({ embeds: [embed] });
     }
-};
+} as commandType;
