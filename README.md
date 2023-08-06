@@ -13,5 +13,6 @@ Once you've done that, run the code below and happy bot-making!
 ```bash
 # Run
 npm i
+npm run build
 npm run start
 ```
